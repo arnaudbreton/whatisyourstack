@@ -1,61 +1,101 @@
 package models
 
+import (
+    //"fmt"
+    "errors"
+)
 type Language struct {
-	Name string
+    Name string
 }
 
 type Technology struct {
-	Languages []Language
-	//Technologies []Technology
+    Name string
+    languages map[string]Language
+    //Technologies []Technology
 }
 
-func (t *Technology) AddLanguage(l Language) bool {
-	if t.Languages == nil {
-		t.Languages = make([]Language, 0, 5)
-		t.Languages = append(t.Languages, l)
-
-		return true
-	}
-
-	for _, tl := range t.Languages {
-        if tl == l {
-            return false
-        }
+func NewTechnology(name string) (*Technology, error) {
+    if len(name) == 0 {
+        return nil, errors.New("Empty name")
     }
-
-    if len(t.Languages)+1 > cap(t.Languages) {
-    	newLanguages := make([]Language, len(t.Languages)+1, 2*cap(t.Languages))
-	    for i := range t.Languages {
-	        newLanguages[i] = t.Languages[i]
-	    }
-	    t.Languages = newLanguages
-    }
-    
-    t.Languages = append(t.Languages, l)
-
-    return true
+    return &Technology{
+        Name: name, 
+        languages: make(map[string]Language),
+    }, nil
 }
 
-func (t *Technology) RemoveLanguage(l Language) bool {
-	if t.Languages == nil {
-		return false
-	}
-
-	for i, tl := range t.Languages {
-        if tl == l {
-        	t.Languages = t.Languages[:i+copy(t.Languages[i:], t.Languages[i+1:])]
-			return true
-        }
+func (t *Technology) AddLanguage(l *Language) error {
+    if l == nil || len(l.Name) == 0 {
+        return errors.New("Empty language")
     }
 
-    return false
+    t.languages[l.Name] = *l
+    return nil
+}
+
+func (t *Technology) RemoveLanguage(l *Language) error {
+    if len(l.Name) == 0 || &l == nil {
+        return errors.New("Empty language")
+    }
+
+    delete(t.languages, l.Name)
+    return nil
+}
+
+func (t *Technology) GetLanguages() []Language {
+    l := make([]Language, 0, len(t.languages))
+
+    for  _, language := range t.languages {
+       l = append(l, language)
+    }
+
+    return l
 }
 
 type Company struct {
-	Name string
+    Name string
 }
 
 type Stack struct {
-	Company Company
-	Technologies []Technology
+    Company Company
+    technologies map[string]Technology
+}
+
+func NewStack(company *Company) (*Stack, error) {
+    if company == nil || len(company.Name) == 0 {
+        return nil, errors.New("Empty company")
+    }
+
+    return &Stack{
+            Company: *company, 
+            technologies: make(map[string]Technology),
+        }, nil
+}
+
+func (s *Stack) AddTechnology(t *Technology) error {
+    if t == nil || len(t.Name) == 0 {
+        return errors.New("Empty Technology")
+    } 
+
+    s.technologies[t.Name] = *t
+    return nil
+}
+
+func (s *Stack) RemoveTechnology(t *Technology) error {
+    if t == nil || len(t.Name) == 0 {
+        return errors.New("Empty Technology")
+    } 
+
+    delete(s.technologies, t.Name)
+    return nil
+}
+
+func (s *Stack) GetTechnologies() []Technology {
+    t := make([]Technology, 0, len(s.technologies))
+
+    for  _, technology := range s.technologies {
+       t = append(t, technology)
+    }
+
+    return t
 }
