@@ -1,8 +1,9 @@
 package models
 
 import (
-    //"fmt"
+    // "fmt"
     "errors"
+    "encoding/json"
 )
 type Language struct {
     Name string
@@ -52,6 +53,13 @@ func (t *Technology) GetLanguages() []Language {
     return l
 }
 
+func (t *Technology) MarshalJSON() ([]byte, error) {
+    return json.Marshal(map[string]interface{}{
+        "name": t.Name,
+        "languages": t.GetLanguages(),
+    })
+}
+
 type Company struct {
     Name string
 }
@@ -98,4 +106,11 @@ func (s *Stack) GetTechnologies() []Technology {
     }
 
     return t
+}
+
+func (s *Stack) MarshalJSON() ([]byte, error) {
+    return json.Marshal(map[string]interface{}{
+        "company": s.Company,
+        "technologies": s.GetTechnologies(),
+    })
 }

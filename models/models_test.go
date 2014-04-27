@@ -3,6 +3,7 @@ package models
 import (
     "testing"
     "github.com/stretchr/testify/assert"
+    "encoding/json"
     // "fmt"
    )
 
@@ -54,6 +55,27 @@ func Test_RemoveLanguage(t *testing.T) {
 
     err := tech.RemoveLanguage(&Language{}) 
     assert.NotNil(t, err)
+}
+
+func Test_Technology_MarshalJSON(t *testing.T) {
+    tech, _ := NewTechnology("Test")
+    golang := &Language{"Go"}
+    python := &Language{"Python"}
+
+    tech.AddLanguage(golang) 
+    tech.AddLanguage(python) 
+
+    b, err := tech.MarshalJSON()
+
+    assert.Nil(t, err)
+
+    expectedMarshalling := make(map[string]interface{})
+    expectedMarshalling["languages"] = append(make([]Language, 0), *golang, *python)
+    expectedMarshalling["name"] = tech.Name
+
+    marshalledExpected, _ := json.Marshal(expectedMarshalling)
+
+    assert.Equal(t, marshalledExpected, b)
 }
 
 func Test_NewStack(t *testing.T) {
@@ -109,4 +131,26 @@ func Test_RemoveTechnology(t *testing.T) {
 
     err = stack.RemoveTechnology(&Technology{})
     assert.NotNil(t, err)
+}
+
+func Test_Stack_MarshalJSON(t *testing.T) {
+    company := Company{"Test company"}
+    stack, _ := NewStack(&company)
+
+    tech, _ := NewTechnology("Martini")
+    golang := &Language{"Go"}
+
+    tech.AddLanguage(golang) 
+    stack.AddTechnology(tech)
+
+    b, err := stack.MarshalJSON()
+    assert.Nil(t, err)
+
+    expectedMarshalling := make(map[string]interface{})
+    expectedMarshalling["technologies"] = stack.GetTechnologies()
+    expectedMarshalling["company"] = company
+
+    marshalledExpected, _ := json.Marshal(expectedMarshalling)
+
+    assert.Equal(t, string(marshalledExpected), string(b))
 }
