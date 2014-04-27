@@ -6,13 +6,24 @@ import (
     "encoding/json"
 )
 type Language struct {
-    Name string
+    Id      int64 `json:"-"`
+    Name    string
+}
+
+type LanguageApi struct {
+    Name        string
 }
 
 type Technology struct {
-    Name string
-    languages map[string]Language
+    Id          int64
+    Name        string
+    languages   map[string]Language
     //Technologies []Technology
+}
+
+type TechnologyApi struct {
+    Name        string
+    Languages   []LanguageApi
 }
 
 func NewTechnology(name string) (*Technology, error) {
@@ -23,6 +34,28 @@ func NewTechnology(name string) (*Technology, error) {
         Name: name, 
         languages: make(map[string]Language),
     }, nil
+}
+
+func NewTechnologyFromApi(techApi *TechnologyApi) (*Technology, error) {
+    if techApi == nil {
+        return nil, errors.New("Empty Tech Api")
+    }
+
+    tech, err := NewTechnology(techApi.Name)
+
+    if err != nil {
+        return nil, err
+    }
+
+    for _, langApi := range techApi.Languages {
+        if 0 == len(langApi.Name) {
+            return nil, errors.New("Empty Lang Api")
+        }
+        langApi := &Language{Name:langApi.Name}
+        tech.AddLanguage(langApi)
+    }
+
+    return tech, nil
 }
 
 func (t *Technology) AddLanguage(l *Language) error {
@@ -61,12 +94,23 @@ func (t *Technology) MarshalJSON() ([]byte, error) {
 }
 
 type Company struct {
-    Name string
+    Id      int64 `json:"-"`
+    Name    string
+}
+
+type CompanyApi struct {
+    Name    string
 }
 
 type Stack struct {
-    Company Company
-    technologies map[string]Technology
+    Id              int64
+    Company         Company
+    technologies    map[string]Technology
+}
+
+type StackApi struct {
+    Company CompanyApi
+    Technologies []TechnologyApi
 }
 
 func NewStack(company *Company) (*Stack, error) {
@@ -78,6 +122,26 @@ func NewStack(company *Company) (*Stack, error) {
             Company: *company, 
             technologies: make(map[string]Technology),
         }, nil
+}
+
+func NewStackFromApi(stackApi *StackApi) (*Stack, error) {
+    company := &Company{Name:stackApi.Company.Name}
+    stack, err := NewStack(company)
+
+    if err != nil {
+        return nil, err
+    }
+
+    for _, techApi := range stackApi.Technologies {
+        tech, err := NewTechnologyFromApi(&techApi)
+
+        if err != nil {
+            return nil, err
+        }
+        stack.AddTechnology(tech)
+    }
+
+    return stack, nil
 }
 
 func (s *Stack) AddTechnology(t *Technology) error {

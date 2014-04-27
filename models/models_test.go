@@ -23,7 +23,7 @@ func Test_NewTechnology(t *testing.T) {
 
 func Test_AddLanguage(t *testing.T) {
     tech, _ := NewTechnology("Test")
-    golang := Language{"Go"}
+    golang := Language{Name:"Go"}
 
     err := tech.AddLanguage(&golang) 
     assert.Nil(t, err)
@@ -39,9 +39,9 @@ func Test_AddLanguage(t *testing.T) {
 
 func Test_RemoveLanguage(t *testing.T) {
     tech, _ := NewTechnology("Test")
-    golang := Language{"Go"}
-    python := Language{"Python"}
-    ruby := Language{"Ruby"}
+    golang := Language{Name:"Go"}
+    python := Language{Name:"Python"}
+    ruby := Language{Name:"Ruby"}
 
     tech.AddLanguage(&golang) 
     tech.AddLanguage(&python) 
@@ -59,8 +59,8 @@ func Test_RemoveLanguage(t *testing.T) {
 
 func Test_Technology_MarshalJSON(t *testing.T) {
     tech, _ := NewTechnology("Test")
-    golang := &Language{"Go"}
-    python := &Language{"Python"}
+    golang := &Language{Name:"Go"}
+    python := &Language{Name:"Python"}
 
     tech.AddLanguage(golang) 
     tech.AddLanguage(python) 
@@ -79,7 +79,7 @@ func Test_Technology_MarshalJSON(t *testing.T) {
 }
 
 func Test_NewStack(t *testing.T) {
-    company := Company{"Test company"}
+    company := Company{Name:"Test company"}
     stack, err := NewStack(&company)
 
     assert.Nil(t, err)
@@ -95,11 +95,11 @@ func Test_NewStack(t *testing.T) {
 }
 
 func Test_AddTechnology(t *testing.T) {
-    company := Company{"Test company"}
+    company := Company{Name:"Test company"}
     stack, _ := NewStack(&company)
 
     tech, _ := NewTechnology("Martini")
-    golang := Language{"Go"}
+    golang := Language{Name:"Go"}
 
     tech.AddLanguage(&golang)
 
@@ -112,11 +112,11 @@ func Test_AddTechnology(t *testing.T) {
 }
 
 func Test_RemoveTechnology(t *testing.T) {
-    company := Company{"Test company"}
+    company := Company{Name:"Test company"}
     stack, _ := NewStack(&company)
 
     tech, _ := NewTechnology("Martini")
-    golang := Language{"Go"}
+    golang := Language{Name:"Go"}
 
     tech.AddLanguage(&golang)
 
@@ -134,11 +134,11 @@ func Test_RemoveTechnology(t *testing.T) {
 }
 
 func Test_Stack_MarshalJSON(t *testing.T) {
-    company := Company{"Test company"}
+    company := Company{Name:"Test company"}
     stack, _ := NewStack(&company)
 
     tech, _ := NewTechnology("Martini")
-    golang := &Language{"Go"}
+    golang := &Language{Name:"Go"}
 
     tech.AddLanguage(golang) 
     stack.AddTechnology(tech)
